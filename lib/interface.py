@@ -1,7 +1,8 @@
 import serial
 import threading
+import struct
 
-from lib.message import Message
+from .message import Message
 
 
 class Interface:
@@ -160,7 +161,11 @@ class Interface:
 
     # TODO: Does not work - but is implemented according to spec. Bad documentation?
     def set_jog_joint_params(self, velocity, acceleration, queue=True):
-        request = Message([0xAA, 0xAA], 2, 70, True, queue, velocity + acceleration, direction='out')
+        payload = bytearray()
+        payload.extend(struct.pack('<f', velocity))
+        payload.extend(struct.pack('<f', acceleration))
+
+        request = Message([0xAA, 0xAA], 2, 70, True, queue, payload, direction='out')
         return self.send(request)
 
     def get_jog_coordinate_params(self):
@@ -169,7 +174,11 @@ class Interface:
 
     # TODO: Does not work - but is implemented according to spec. Bad documentation?
     def set_jog_coordinate_params(self, velocity, acceleration, queue=True):
-        request = Message([0xAA, 0xAA], 2, 71, True, queue, velocity + acceleration, direction='out')
+        payload = bytearray()
+        payload.extend(struct.pack('<f', velocity))
+        payload.extend(struct.pack('<f', acceleration))
+
+        request = Message([0xAA, 0xAA], 2, 71, True, queue, payload, direction='out')
         return self.send(request)
 
     def get_jog_common_params(self):
@@ -178,7 +187,11 @@ class Interface:
 
     # TODO: Does not work - but is implemented according to spec. Bad documentation?
     def set_jog_common_params(self, velocity_ratio, acceleration_ratio, queue=True):
-        request = Message([0xAA, 0xAA], 2, 72, True, queue, [velocity_ratio, acceleration_ratio], direction='out')
+        payload = bytearray()
+        payload.extend(struct.pack('<f', velocity_ratio))
+        payload.extend(struct.pack('<f', acceleration_ratio))
+
+        request = Message([0xAA, 0xAA], 2, 72, True, queue, payload, direction='out')
         return self.send(request)
 
     def set_jog_command(self, jog_type, command, queue=True):
@@ -205,8 +218,11 @@ class Interface:
         request = Message([0xAA, 0xAA], 2, 81, False, False, [], direction='out')
         return self.send(request)
 
-    def set_point_to_point_coordinate_params(self, coordinate_velocity, effector_velocity, coordinate_acceleration, effector_acceleration, queue=True):
-        request = Message([0xAA, 0xAA], 2, 81, True, queue, [coordinate_velocity, effector_velocity, coordinate_acceleration, effector_acceleration], direction='out')
+    def set_point_to_point_coordinate_params(self, coordinate_velocity, effector_velocity, coordinate_acceleration,
+                                             effector_acceleration, queue=True):
+        request = Message([0xAA, 0xAA], 2, 81, True, queue,
+                          [coordinate_velocity, effector_velocity, coordinate_acceleration, effector_acceleration],
+                          direction='out')
         return self.send(request)
 
     def get_point_to_point_jump_params(self):
@@ -263,12 +279,16 @@ class Interface:
         request = Message([0xAA, 0xAA], 2, 90, False, False, [], direction='out')
         return self.send(request)
 
-    def set_continous_trajectory_params(self, max_planned_acceleration, max_junction_velocity, acceleration, queue=True):
-        request = Message([0xAA, 0xAA], 2, 90, True, queue, [max_planned_acceleration, max_junction_velocity, acceleration, 0], direction='out')
+    def set_continous_trajectory_params(self, max_planned_acceleration, max_junction_velocity, acceleration,
+                                        queue=True):
+        request = Message([0xAA, 0xAA], 2, 90, True, queue,
+                          [max_planned_acceleration, max_junction_velocity, acceleration, 0], direction='out')
         return self.send(request)
 
-    def set_continous_trajectory_real_time_params(self, max_planned_acceleration, max_junction_velocity, period, queue=True):
-        request = Message([0xAA, 0xAA], 2, 90, True, queue, [max_planned_acceleration, max_junction_velocity, period, 1], direction='out')
+    def set_continous_trajectory_real_time_params(self, max_planned_acceleration, max_junction_velocity, period,
+                                                  queue=True):
+        request = Message([0xAA, 0xAA], 2, 90, True, queue,
+                          [max_planned_acceleration, max_junction_velocity, period, 1], direction='out')
         return self.send(request)
 
     def set_continous_trajectory_command(self, mode, x, y, z, velocity, queue=True):
@@ -283,8 +303,11 @@ class Interface:
         request = Message([0xAA, 0xAA], 2, 100, False, False, [], direction='out')
         return self.send(request)
 
-    def set_arc_params(self, coordinate_velocity, effector_velocity, coordinate_acceleration, effector_acceleration, queue=True):
-        request = Message([0xAA, 0xAA], 2, 100, True, queue, [coordinate_velocity, effector_velocity, coordinate_acceleration, effector_acceleration], direction='out')
+    def set_arc_params(self, coordinate_velocity, effector_velocity, coordinate_acceleration, effector_acceleration,
+                       queue=True):
+        request = Message([0xAA, 0xAA], 2, 100, True, queue,
+                          [coordinate_velocity, effector_velocity, coordinate_acceleration, effector_acceleration],
+                          direction='out')
         return self.send(request)
 
     def set_arc_command(self, circumference_point, ending_point, queue=True):
@@ -356,7 +379,8 @@ class Interface:
         return self.send(request)
 
     def set_angle_sensor_static_error(self, index, rear_arm_angle_error, front_arm_angle_error):
-        request = Message([0xAA, 0xAA], 2, 140, True, False, [rear_arm_angle_error, front_arm_angle_error], direction='out')
+        request = Message([0xAA, 0xAA], 2, 140, True, False, [rear_arm_angle_error, front_arm_angle_error],
+                          direction='out')
         return self.send(request)
 
     def get_wifi_status(self):
