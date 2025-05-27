@@ -4,7 +4,6 @@ import struct
 
 from .message import Message
 
-
 class Interface:
     def __init__(self, port):
         threading.Thread.__init__(self)
